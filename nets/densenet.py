@@ -15,13 +15,7 @@ def trunc_normal(stddev): return tf.truncated_normal_initializer(stddev=stddev)
 def bn_act_conv_drp(current, num_outputs, kernel_size, scope='block'):
     current = slim.batch_norm(current, scope=scope + '_bn')
     current = tf.nn.relu(current)
-
-    if kernel_size[0] == 3:
-        current = slim.conv2d(current, num_outputs, kernel_size, padding = 'same', scope=scope + '_conv')
-    else:
-        current = slim.conv2d(current, num_outputs, kernel_size, scope=scope + '_conv')
-
-    #current = slim.conv2d(current, num_outputs, kernel_size, scope=scope + '_conv')
+    current = slim.conv2d(current, num_outputs, kernel_size, scope=scope + '_conv')
     current = slim.dropout(current, scope=scope + '_dropout')
     return current
 
@@ -58,7 +52,7 @@ def densenet(images, num_classes=1000, is_training=False,
       end_points: a dictionary from components of the network to the corresponding
         activation.
     """
-    growth = 32  # 12
+    growth = 24  # 12
     compression_rate = 0.5
 
     final_endpoint = 'Max_f'
@@ -90,7 +84,7 @@ def densenet(images, num_classes=1000, is_training=False,
             #Output Size 56 * 56 * growth * 2
 
             #Dense Block1
-            net = block(net, 6, growth, "Block_3a")
+            net = block(net, 5, growth, "Block_3a")
             #Output Size 56 * 56 * growth
 
             #Transition Layer
@@ -101,13 +95,13 @@ def densenet(images, num_classes=1000, is_training=False,
             #Output Size 56 * 56 * growth
 
             end_point = 'AvgPool_5a_2x2'
-            net = slim.avg_pool2d(net, [2, 2], stride=2, scope=end_point) #输出减少50%
+            net = slim.avg_pool2d(net, [2, 2], stride=2, scope=end_point)
             end_points[end_point] = net
             if end_point == final_endpoint: return net, end_points
             # Output Size 28 * 28 * growth
 
             #Dense Block2
-            net = block(net, 12, growth, "Block_1b")
+            net = block(net, 5, growth, "Block_1b")
             #Output Size 28 * 28 * growth
 
             #Transition Layer
@@ -124,7 +118,7 @@ def densenet(images, num_classes=1000, is_training=False,
             # Output Size 14 * 14 * growth
 
             #Dense Block3
-            net = block(net, 32, growth, "Block_1c")
+            net = block(net, 5, growth, "Block_1c")
             #Output Size 14 * 14 * growth
 
             #Transition Layer
@@ -141,7 +135,7 @@ def densenet(images, num_classes=1000, is_training=False,
             # Output Size 7 * 7 * growth
 
             # Dense Block4
-            net = block(net, 32, growth, "Block_1d")
+            net = block(net, 5, growth, "Block_1d")
             # Output Size 7 * 7 * growth
 
             with tf.variable_scope('Logits'):
