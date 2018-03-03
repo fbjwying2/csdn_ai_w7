@@ -22,7 +22,7 @@ def bn_act_conv_drp(current, num_outputs, kernel_size, scope='block'):
         current = slim.conv2d(current, num_outputs, kernel_size, scope=scope + '_conv')
 
     current = slim.dropout(current, scope=scope + '_dropout')
-    
+
     return current
 
 
@@ -58,7 +58,7 @@ def densenet(images, num_classes=1000, is_training=False,
       end_points: a dictionary from components of the network to the corresponding
         activation.
     """
-    growth = 32  # 12
+    growth = 12
     compression_rate = 0.5
 
     final_endpoint = 'Max_f'
